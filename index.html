@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+<title>i m text</title>
+<style type="text/css">
+#art { border: thin solid black; display: block; margin-bottom: 30px }
+#msg { color: red }
+</style>
+<script language="javascript">
+var width = 100;
+var height = 100;
+var pxSide = 10; // a pixel will be represented this wide and high
+function draw() {
+	document.getElementById("msg").innerHTML = "";
+	var text = document.getElementById("text").value || "";
+
+	// some fencing
+	text = text.trim();
+	if (text.indexOf("\r\n") == -1) {
+		text = text.replace(/\n/g, "\r\n");
+	}
+	while (text.length % 3 != 0) {
+		text += "\r\n";
+	}
+
+	// setup canvas
+	var art = document.getElementById("art");
+	width = +document.getElementById("w").value;
+	height = +document.getElementById("h").value;
+	art.setAttribute("width", width * pxSide);
+	art.setAttribute("height", height * pxSide);
+
+	var ctx = art.getContext("2d");
+	ctx.fillStyle = "rgb(255, 255, 255)";
+	ctx.fillRect(0, 0, art.width, art.height);
+
+	var result = "";
+	var row = height - 1;
+	var col = 0;
+	for (var i = 0; i < text.length; i += 3) {
+		var r = text.charCodeAt(i + 2);
+		if (r < 0 || r > 255) {
+			r = 0;
+		}
+		var g = text.charCodeAt(i + 1);
+		if (g < 0 || g > 255) {
+			g = 0;
+		}
+		var b = text.charCodeAt(i + 0);
+		if (b < 0 || b > 255) {
+			b = 0;
+		}
+		ctx.fillStyle = "rgb(" + r + ", " + g + ", " + b + ")";
+		ctx.fillRect(col * pxSide, row * pxSide, pxSide, pxSide);
+		if (++col >= width) {
+			col = 0;
+			row--;
+		}
+	}
+	if (row < 0 && col > 0) {
+		document.getElementById("msg").innerHTML = "overflow, increase canvas size";
+	}
+}
+</script>
+</head>
+<body onload="draw()">
+<center><canvas id="art"></canvas></center>
+<div id="msg"></div>
+<!-- table, problem? -->
+<table>
+<tr><td><textarea id="text" cols="90" rows="7">
+#include <iostream>
+
+int main()
+{
+	std::cout << "Hello, World!" << std::endl;
+	return 0;
+}
+</textarea></td></tr>
+<tr><td>
+<input type="button" onclick="draw()" value="convert"></input>
+BMP width <input type="text" id="w" value="8" size="3"></input>;
+BMP height <input type="text" id="h" value="4" size="3"></input>
+</td></tr>
+</table>
+
+</body>
+</html>
