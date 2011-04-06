@@ -5,6 +5,7 @@
 <style type="text/css">
 #art { border: thin solid black; display: block; margin-bottom: 30px }
 #msg { color: red }
+#info { font-style: italic; background-color: #EFF }
 </style>
 <script language="javascript">
 var imtext = (function () {
@@ -74,6 +75,8 @@ var imtext = (function () {
 <body onload="imtext.draw()">
 <center><canvas id="art"></canvas></center>
 <div id="msg"></div>
+
+<div id="info">Write text below, click on convert. See visualization on canvas above.</div>
 <!-- table, problem? -->
 <table>
 <tr><td><textarea id="text" cols="90" rows="7">
