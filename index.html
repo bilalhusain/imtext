@@ -7,63 +7,71 @@
 #msg { color: red }
 </style>
 <script language="javascript">
-var width = 100;
-var height = 100;
-var pxSide = 10; // a pixel will be represented this wide and high
-function draw() {
-	document.getElementById("msg").innerHTML = "";
-	var text = document.getElementById("text").value || "";
+var imtext = (function () {
+	// canvas size is (bmpWidth * pxSide) x (bmpHeight * pxSide)
+	var defaultWidth = 10; // bmp width
+	var defaultHeight = 10; // bmp height
+	var pxSide = 10; // a pixel will be represented this wide and high
 
-	// some fencing
-	text = text.trim();
-	if (text.indexOf("\r\n") == -1) {
-		text = text.replace(/\n/g, "\r\n");
-	}
-	while (text.length % 3 != 0) {
-		text += "\r\n";
-	}
+	return {
+	draw: function () {
+		document.getElementById("msg").innerHTML = "";
+		var text = document.getElementById("text").value || "";
 
-	// setup canvas
-	var art = document.getElementById("art");
-	width = +document.getElementById("w").value;
-	height = +document.getElementById("h").value;
-	art.setAttribute("width", width * pxSide);
-	art.setAttribute("height", height * pxSide);
+		// some fencing
+		text = text.trim();
+		if (text.indexOf("\r\n") == -1) {
+			text = text.replace(/\n/g, "\r\n");
+		}
+		while (text.length % 3 != 0) {
+			text += "\r\n";
+		}
 
-	var ctx = art.getContext("2d");
-	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.fillRect(0, 0, art.width, art.height);
+		// setup canvas
+		var art = document.getElementById("art");
+		width = +document.getElementById("w").value || defaultWidth;
+		height = +document.getElementById("h").value || defaultHeight;
+		art.setAttribute("width", width * pxSide);
+		art.setAttribute("height", height * pxSide);
 
-	var result = "";
-	var row = height - 1;
-	var col = 0;
-	for (var i = 0; i < text.length; i += 3) {
-		var r = text.charCodeAt(i + 2);
-		if (r < 0 || r > 255) {
-			r = 0;
+		var ctx = art.getContext("2d");
+		ctx.fillStyle = "rgb(255, 255, 255)";
+		ctx.fillRect(0, 0, art.width, art.height);
+
+		// go draw
+		var result = "";
+		var row = height - 1;
+		var col = 0;
+		for (var i = 0; i < text.length; i += 3) {
+			var r = text.charCodeAt(i + 2);
+			if (r < 0 || r > 255) {
+				r = 0;
+			}
+			var g = text.charCodeAt(i + 1);
+			if (g < 0 || g > 255) {
+				g = 0;
+			}
+			var b = text.charCodeAt(i + 0);
+			if (b < 0 || b > 255) {
+				b = 0;
+			}
+			ctx.fillStyle = "rgb(" + r + ", " + g + ", " + b + ")";
+			ctx.fillRect(col * pxSide, row * pxSide, pxSide, pxSide);
+			if (++col >= width) {
+				col = 0;
+				row--;
+			}
 		}
-		var g = text.charCodeAt(i + 1);
-		if (g < 0 || g > 255) {
-			g = 0;
-		}
-		var b = text.charCodeAt(i + 0);
-		if (b < 0 || b > 255) {
-			b = 0;
-		}
-		ctx.fillStyle = "rgb(" + r + ", " + g + ", " + b + ")";
-		ctx.fillRect(col * pxSide, row * pxSide, pxSide, pxSide);
-		if (++col >= width) {
-			col = 0;
-			row--;
+		if (row < 0 && col > 0) {
+			document.getElementById("msg").innerHTML = "overflow, increase canvas size";
 		}
 	}
-	if (row < 0 && col > 0) {
-		document.getElementById("msg").innerHTML = "overflow, increase canvas size";
-	}
-}
+	};
+})();
+
 </script>
 </head>
-<body onload="draw()">
+<body onload="imtext.draw()">
 <center><canvas id="art"></canvas></center>
 <div id="msg"></div>
 <!-- table, problem? -->
@@ -78,7 +86,7 @@ int main()
 }
 </textarea></td></tr>
 <tr><td>
-<input type="button" onclick="draw()" value="convert"></input>
+<input type="button" onclick="imtext.draw()" value="convert"></input>
 BMP width <input type="text" id="w" value="8" size="3"></input>;
 BMP height <input type="text" id="h" value="4" size="3"></input>
 </td></tr>
